@@ -1,5 +1,7 @@
 package upvictoria.pm_may_ago_2025.iti_271421.p1u3.rodriguez_contreras
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     var startIndex: Int = 0
     var maxLength: Int = 200
 
+    var PICK_PDF_FILE: Int = 1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,17 +54,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // nuestro speakaloid
         speakaloid = TextToSpeech(this, this)
 
-        // click listener for our button.
+        // listener q envia al intent q lee el archivo seleccionado
         selectBtn.setOnClickListener {
-            extractData()
-            if (textoExtraido.isNotBlank()) {
-                speakaloid?.stop()
-                readBtn.isInvisible = false
-                readBtn.isGone = false
-                pauseBtn.isGone = true
-                playBtn.isGone = true
-
-            }
+            seleccionarArchivo()
         }
 
         // listener pa leer el texto extraido
@@ -88,49 +84,17 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val result = speakaloid!!.setLanguage(Locale.US)
+
+            // speakaloid mexican version
+            val spanol = Locale("spa", "MEX")
+            //val result = speakaloid!!.setLanguage(Locale.US)
+            val result = speakaloid!!.setLanguage(spanol)
 
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e("TTS","The Language not supported!")
             } else {
                 readBtn!!.isEnabled = true
             }
-        }
-    }
-
-    private fun extractData() {
-        // try and catch block to handle extract data operation.
-        try {
-
-            // variable para nuestro pdf extracter.
-            val pdfReader: PdfReader = PdfReader("res/raw/lana.pdf")
-
-            // a variable for pages of our pdf.
-            val n = pdfReader.numberOfPages
-
-            for (i in 0 until n) {
-
-                // appending data to extracted text from our pdf file using pdf reader.
-                textoExtraido =
-                    """
-                 $textoExtraido${
-                        PdfTextExtractor.getTextFromPage(pdfReader, i + 1).trim { it <= ' ' }
-                    }
-                
-                 """.trimIndent()
-                // to extract the PDF content from the different pages
-            }
-
-            // ponerle el extracted text a nuestro text view.
-            extractedTV.setText(textoExtraido)
-
-            // cerrar lector d pdfs
-            pdfReader.close()
-
-        }
-        // exception using catch block
-        catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
@@ -168,6 +132,52 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             speakaloid!!.shutdown()
         }
         super.onDestroy()
+    }
+
+    private fun seleccionarArchivo() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/pdf"
+        }
+        startActivityForResult(intent, PICK_PDF_FILE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_PDF_FILE && resultCode == RESULT_OK) {
+            data?.data?.also { uri ->
+                // abrimos y extraemos texto del PDF usando el URI
+                extractDataFromUri(uri)
+                startIndex = 0
+                if (textoExtraido.isNotBlank()) {
+                    readBtn.isInvisible = false
+                    readBtn.isGone = false
+                    pauseBtn.isGone = true
+                    playBtn.isGone = true
+                }
+            }
+        }
+    }
+
+    private fun extractDataFromUri(uri: Uri) {
+        try {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                val pdfReader = PdfReader(inputStream)
+                val n = pdfReader.numberOfPages
+                val sb = StringBuilder()
+                // transformar a texto usando el stringbuilder para luego pasarlo a string
+                for (i in 0 until n) {
+                    sb.append(PdfTextExtractor.getTextFromPage(pdfReader, i + 1).trim())
+                    sb.append("\n\n")
+                }
+                textoExtraido = sb.toString()
+                extractedTV.text = textoExtraido
+                pdfReader.close()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }
