@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="30dp"
+    tools:context=".MainActivity">
+
+    <!-- header -->
+    <TextView
+        android:id="@+id/idTVExtracter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="30dp"
+        android:text="Speakaloid"
+        android:textAlignment="center"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/idTVSubtitulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="Hola, soy tu convertidor TTS de PDFs favorito"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_below="@id/idTVExtracter"/>
+
+    <!-- visor escroleable para nuestro texto -->
+    <ScrollView
+        android:id="@+id/idScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/idBtnSelect"
+        android:layout_below="@id/idTVSubtitulo"
+        android:paddingVertical="20dp">
+
+        <!-- componente q almacena el texto -->
+        <TextView
+            android:id="@+id/idTVPDF"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </ScrollView>
+
+    <!-- botones -->
+    <Button
+        android:id="@+id/idBtnSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/idBtnLeer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@color/claro"
+        android:text="Seleccionar PDF"
+        android:textAllCaps="false" />
+    <Button
+        android:id="@+id/idBtnLeer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/idLinear"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@color/oscuro"
+        android:text="Leer PDF"
+        android:textAllCaps="false" />
+
+    <LinearLayout
+        android:id="@+id/idLinear"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/idBtnPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/oscuro"
+            android:src="@android:drawable/ic_media_play"
+            android:textAllCaps="false" />
+
+        <ImageButton
+            android:id="@+id/idBtnPausa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/oscuro"
+            android:src="@android:drawable/ic_media_pause"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+</RelativeLayout>
